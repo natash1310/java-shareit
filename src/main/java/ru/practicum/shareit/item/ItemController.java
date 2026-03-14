@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -19,38 +20,41 @@ public class ItemController {
     private final String headerUserId = "X-Sharer-User-Id";
 
     @GetMapping("/all")
-    public List<ItemDto> getAll() {
-        return itemService.getAll();
+    public ResponseEntity<List<ItemDto>> getAll() {
+        return ResponseEntity.ok(itemService.getAll());
     }
 
     @PostMapping
-    public ItemDto add(@RequestBody @Validated(Create.class) ItemDto itemDto, @RequestHeader(headerUserId) Long userId) {
-        return itemService.add(userId, itemDto);
+    public ResponseEntity<ItemDto> add(@RequestBody @Validated(Create.class) ItemDto itemDto,
+                                       @RequestHeader(headerUserId) Long userId) {
+        return ResponseEntity.ok(itemService.add(userId, itemDto));
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto get(@PathVariable Long itemId) {
-        return itemService.get(itemId);
+    public ResponseEntity<ItemDto> get(@PathVariable Long itemId) {
+        return ResponseEntity.ok(itemService.get(itemId));
     }
 
     @GetMapping
-    public List<ItemDto> getByOwner(@RequestHeader(headerUserId) Long userId) {
-        return itemService.getByOwner(userId);
+    public ResponseEntity<List<ItemDto>> getByOwner(@RequestHeader(headerUserId) Long userId) {
+        return ResponseEntity.ok(itemService.getByOwner(userId));
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getByOwner(@RequestParam String text) {
-        return itemService.search(text);
+    public ResponseEntity<List<ItemDto>> search(@RequestParam String text) {  // Исправил имя параметра
+        return ResponseEntity.ok(itemService.search(text));
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@Validated(Update.class) @RequestBody ItemDto itemDto, @PathVariable Long itemId,
-                          @RequestHeader(headerUserId) Long userId) {
-        return itemService.update(itemDto, itemId, userId);
+    public ResponseEntity<ItemDto> update(@Validated(Update.class) @RequestBody ItemDto itemDto,
+                                          @PathVariable Long itemId,
+                                          @RequestHeader(headerUserId) Long userId) {
+        return ResponseEntity.ok(itemService.update(itemDto, itemId, userId));
     }
 
     @DeleteMapping("/{id}")
-    public Boolean deleteItem(@PathVariable Long itemId) {
-        return itemService.delete(itemId);
+    public ResponseEntity<Void> deleteItem(@PathVariable Long itemId) {
+        itemService.delete(itemId);
+        return ResponseEntity.ok().build();
     }
 }

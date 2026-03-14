@@ -58,12 +58,11 @@ public class UserStorageInMemory implements UserStorage {
     }
 
     @Override
-    public Boolean delete(Long userId) {
+    public void delete(Long userId) {
         if (userStorage.containsKey(userId)) {
             emailStorage.remove(userStorage.get(userId).getEmail());
             userStorage.remove(userId);
         }
-        return true;
     }
 
     private void emailCheck(User user) {
