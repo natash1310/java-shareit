@@ -38,22 +38,9 @@ public class ErrorHandler {
         return new ValidationErrorResponse(violations);
     }
 
-    @ExceptionHandler(HeaderException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequest(final RuntimeException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
     @ExceptionHandler({NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(final RuntimeException exception) {
-        log.error(exception.toString());
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ExceptionHandler({EmailException.class})
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflict(final RuntimeException exception) {
         log.error(exception.toString());
         return new ErrorResponse(exception.getMessage());
     }
