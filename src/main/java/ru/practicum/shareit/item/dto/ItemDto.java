@@ -2,22 +2,25 @@ package ru.practicum.shareit.item.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.marks.Create;
 
 @Data
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class ItemDto {
-    private Long id;
+    Long id;
     @NotBlank(groups = Create.class)
-    private String name;
+    String name;
     @NotBlank(groups = Create.class)
-    private String description;
+    String description;
     @NotNull(groups = Create.class)
-    private Boolean available;
-    private Long ownerId;
-    private Long request;
+    Boolean available;
+    Long ownerId;
+    Long request;
 }

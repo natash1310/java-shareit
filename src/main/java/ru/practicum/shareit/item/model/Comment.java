@@ -7,10 +7,11 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import ru.practicum.shareit.user.User;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "ITEMS", schema = "public")
+@Table(name = "COMMENTS", schema = "public")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
@@ -18,37 +19,36 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Item {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Column(nullable = false)
-    String name;
+    String text;
 
-    @Column(nullable = false)
-    String description;
-
-    @Column(nullable = false)
-    Boolean available;
+    @Column(name = "CREATED_DATE", nullable = false)
+    LocalDateTime created;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "OWNER_ID", referencedColumnName = "ID", nullable = false)
-    User owner;
+    @JoinColumn(name = "AUTHOR_ID", referencedColumnName = "ID", nullable = false)
+    User author;
 
-    @Column(name = "REQUEST_ID")
-    Long requestId;
+    @ManyToOne
+    @JoinColumn(name = "ITEM_ID", referencedColumnName = "ID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    Item item;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Item)) return false;
-        return id != null && id.equals(((Item) o).getId());
+        if (!(o instanceof Comment)) return false;
+        return id != null && id.equals(((Comment) o).getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, available, owner, requestId);
+        return Objects.hash(id, text, created, author, item);
     }
 }

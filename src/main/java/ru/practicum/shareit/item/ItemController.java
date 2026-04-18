@@ -1,13 +1,17 @@
 package ru.practicum.shareit.item;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemExtendedDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.marks.Create;
 import ru.practicum.shareit.marks.Update;
+import ru.practicum.shareit.user.UserController;
 
 import java.util.List;
 
@@ -15,46 +19,46 @@ import java.util.List;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
-
     private final ItemService itemService;
-    private final String headerUserId = "X-Sharer-User-Id";
 
-    @GetMapping("/all")
-    public ResponseEntity<List<ItemDto>> getAll() {
-        return ResponseEntity.ok(itemService.getAll());
+    @GetMapping
+    public List<ItemExtendedDto> getByOwnerId(@RequestHeader(UserController.headerUserId) Long userId) {
+        return itemService.getByOwnerId(userId);
+    }
+
+    @GetMapping("/{id}")
+    public ItemExtendedDto getById(@RequestHeader(UserController.headerUserId) Long userId,
+                                   @PathVariable Long id) {
+        return itemService.getById(userId, id);
     }
 
     @PostMapping
-    public ResponseEntity<ItemDto> add(@RequestBody @Validated(Create.class) ItemDto itemDto,
-                                       @RequestHeader(headerUserId) Long userId) {
-        return ResponseEntity.ok(itemService.add(userId, itemDto));
+    public ItemDto add(@RequestHeader(UserController.headerUserId) Long userId,
+                       @Validated(Create.class) @RequestBody ItemDto itemDto) {
+        return itemService.add(userId, itemDto);
     }
 
-    @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> get(@PathVariable Long itemId) {
-        return ResponseEntity.ok(itemService.get(itemId));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<ItemDto>> getByOwner(@RequestHeader(headerUserId) Long userId) {
-        return ResponseEntity.ok(itemService.getByOwner(userId));
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> search(@RequestParam String text) {  // Исправил имя параметра
-        return ResponseEntity.ok(itemService.search(text));
-    }
-
-    @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> update(@Validated(Update.class) @RequestBody ItemDto itemDto,
-                                          @PathVariable Long itemId,
-                                          @RequestHeader(headerUserId) Long userId) {
-        return ResponseEntity.ok(itemService.update(itemDto, itemId, userId));
+    @PatchMapping("/{id}")
+    public ItemDto update(@RequestHeader(UserController.headerUserId) Long userId,
+                          @PathVariable Long id,
+                          @Validated(Update.class) @RequestBody ItemDto itemDto) {
+        return itemService.update(userId, id, itemDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable Long itemId) {
-        itemService.delete(itemId);
-        return ResponseEntity.ok().build();
+    public void delete(@PathVariable Long id) {
+        itemService.delete(id);
+    }
+
+    @GetMapping("/search")
+    public List<ItemDto> search(@RequestParam String text) {
+        return itemService.search(text);
+    }
+
+    @PostMapping("{id}/comment")
+    public CommentDto addComment(@RequestHeader(UserController.headerUserId) long userId,
+                                 @PathVariable long id,
+                                 @Valid @RequestBody CommentRequestDto commentRequestDto) {
+        return itemService.addComment(userId, id, commentRequestDto);
     }
 }
